@@ -1,0 +1,57 @@
+version: '3'
+services:
+  bank:
+    build: bank/
+    container_name: bank
+    restart: always
+    ports:
+      - "9000:9000"
+    environment:
+      - ADDR=:9000
+      - MYSQL_ADDR=mysql:3306
+      - MYSQL_PASSWORD=password
+      - DELAY=200ms
+      - FLAG=
+    depends_on:
+      - mysql
+
+  bank2:
+    build: bank2/
+    container_name: bank2
+    restart: always
+    ports:
+      - "9002:9002"
+    environment:
+      - ADDR=:9002
+      - MYSQL_ADDR=mysql:3306
+      - MYSQL_PASSWORD=password
+      - DELAY=200ms
+      - FLAG=
+    depends_on:
+      - mysql
+
+  ructfe:
+    build: ructfe/
+    container_name: ructfe
+    restart: always
+    ports:
+      - "9001:9001"
+    environment:
+      - LISTEN=:9001
+      - REDIS_ADDR=redis:6379
+      - FLAG=
+    depends_on:
+      - redis
+
+  mysql:
+    image: mysql
+    restart: always
+    environment:
+      - MYSQL_RANDOM_ROOT_PASSWORD=true
+    volumes:
+      - "./bank/users.sql:/docker-entrypoint-initdb.d/users.sql:ro"
+      - "./bank2/users.sql:/docker-entrypoint-initdb.d/users2.sql:ro"
+
+  redis:
+    image: redis
+    restart: always
